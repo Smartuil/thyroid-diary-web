@@ -1,0 +1,1090 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>甲安日记 - 甲亢患者的温暖健康伴侣</title>
+  <meta name="description" content="甲安日记是一款面向甲亢患者的长期健康管理应用，帮你在漫长治疗中坚持记录、规律用药、追踪变化。数据完全本地存储，隐私安全有保障。">
+  <meta property="og:title" content="甲安日记 - 甲亢患者的温暖健康伴侣">
+  <meta property="og:description" content="帮你在漫长治疗中坚持记录、规律用药、追踪变化。">
+  <meta property="og:type" content="website">
+  <link rel="icon" href="thyroid-diary/assets/favicon.png" type="image/png">
+  <style>
+    :root {
+      --primary: #F27A54;
+      --primary-hover: #E06943;
+      --primary-light: #FFF0EB;
+      --primary-gradient-start: #FF9A76;
+      --primary-gradient-end: #F27A54;
+      --bg: #FAF7F5;
+      --card-bg: #FFFFFF;
+      --text-main: #332B27;
+      --text-sub: #8C827D;
+      --text-muted: #BDB5B1;
+      --success: #66BB6A;
+      --success-light: #E8F5E9;
+      --warning: #FFA726;
+      --warning-light: #FFF8E1;
+      --radius-card: 20px;
+      --radius-btn: 12px;
+      --shadow-card: 0 8px 24px rgba(242, 122, 84, 0.08);
+      --shadow-card-hover: 0 12px 32px rgba(242, 122, 84, 0.14);
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    html {
+      scroll-behavior: smooth;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    body {
+      font-family: "PingFang SC", "Noto Sans SC", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background-color: var(--bg);
+      color: var(--text-main);
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+
+    .container {
+      max-width: 1120px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    /* ===== NAV ===== */
+    nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 100;
+      background: rgba(250, 247, 245, 0.82);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(189, 181, 177, 0.2);
+      transition: box-shadow 0.3s ease;
+    }
+    nav.scrolled { box-shadow: 0 2px 16px rgba(242, 122, 84, 0.06); }
+    .nav-inner {
+      max-width: 1120px;
+      margin: 0 auto;
+      padding: 0 24px;
+      height: 64px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .nav-logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+      color: var(--text-main);
+    }
+    .nav-logo-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, var(--primary-gradient-start), var(--primary-gradient-end));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+    }
+    .nav-logo-text {
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: -0.3px;
+    }
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 32px;
+      list-style: none;
+    }
+    .nav-links a {
+      text-decoration: none;
+      color: var(--text-sub);
+      font-size: 15px;
+      font-weight: 500;
+      transition: color 0.2s ease;
+    }
+    .nav-links a:hover { color: var(--primary); }
+    .nav-download-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 20px;
+      background: linear-gradient(135deg, var(--primary-gradient-start), var(--primary-gradient-end));
+      color: #fff;
+      border: none;
+      border-radius: var(--radius-btn);
+      font-size: 14px;
+      font-weight: 600;
+      text-decoration: none;
+      transition: opacity 0.2s ease, transform 0.2s ease;
+    }
+    .nav-download-btn:hover { opacity: 0.9; transform: translateY(-1px); }
+
+    .mobile-menu-btn {
+      display: none;
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 8px;
+      color: var(--text-main);
+    }
+    .mobile-menu {
+      display: none;
+      position: fixed;
+      top: 64px;
+      left: 0;
+      right: 0;
+      background: rgba(250, 247, 245, 0.96);
+      backdrop-filter: blur(12px);
+      padding: 16px 24px 24px;
+      border-bottom: 1px solid rgba(189, 181, 177, 0.2);
+      z-index: 99;
+    }
+    .mobile-menu.open { display: block; }
+    .mobile-menu a {
+      display: block;
+      padding: 12px 0;
+      text-decoration: none;
+      color: var(--text-sub);
+      font-size: 16px;
+      font-weight: 500;
+      border-bottom: 1px solid rgba(189, 181, 177, 0.15);
+    }
+    .mobile-menu a:last-child { border-bottom: none; }
+
+    /* ===== HERO ===== */
+    .hero {
+      padding-top: 140px;
+      padding-bottom: 80px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .hero::before {
+      content: '';
+      position: absolute;
+      top: -120px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 600px;
+      height: 600px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(242, 122, 84, 0.08) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 16px 6px 8px;
+      background: var(--primary-light);
+      border-radius: 999px;
+      font-size: 13px;
+      color: var(--primary);
+      font-weight: 600;
+      margin-bottom: 28px;
+    }
+    .hero-badge-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--success);
+      animation: pulse 2s ease-in-out infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.6; transform: scale(0.85); }
+    }
+    .hero h1 {
+      font-size: 48px;
+      font-weight: 800;
+      line-height: 1.2;
+      letter-spacing: -1.5px;
+      margin-bottom: 20px;
+      color: var(--text-main);
+    }
+    .hero h1 .gradient-text {
+      background: linear-gradient(135deg, var(--primary-gradient-start), var(--primary-gradient-end));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .hero p {
+      font-size: 18px;
+      color: var(--text-sub);
+      max-width: 520px;
+      margin: 0 auto 40px;
+      line-height: 1.7;
+    }
+    .hero-buttons {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      flex-wrap: wrap;
+      margin-bottom: 64px;
+    }
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 14px 32px;
+      background: linear-gradient(135deg, var(--primary-gradient-start), var(--primary-gradient-end));
+      color: #fff;
+      border: none;
+      border-radius: var(--radius-btn);
+      font-size: 16px;
+      font-weight: 600;
+      text-decoration: none;
+      transition: opacity 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+      box-shadow: 0 4px 16px rgba(242, 122, 84, 0.3);
+      cursor: pointer;
+    }
+    .btn-primary:hover {
+      opacity: 0.92;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 24px rgba(242, 122, 84, 0.4);
+    }
+    .btn-secondary {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 14px 32px;
+      background: var(--primary-light);
+      color: var(--primary);
+      border: none;
+      border-radius: var(--radius-btn);
+      font-size: 16px;
+      font-weight: 600;
+      text-decoration: none;
+      transition: background 0.2s ease, transform 0.2s ease;
+      cursor: pointer;
+    }
+    .btn-secondary:hover {
+      background: #FFE5DB;
+      transform: translateY(-2px);
+    }
+
+    /* Phone Mockup */
+    .hero-visual {
+      position: relative;
+      max-width: 340px;
+      margin: 0 auto;
+    }
+    .phone-mockup {
+      width: 280px;
+      height: 580px;
+      background: var(--card-bg);
+      border-radius: 40px;
+      border: 8px solid #2A2522;
+      overflow: hidden;
+      box-shadow: 0 24px 64px rgba(51, 43, 39, 0.15), 0 0 0 1px rgba(0,0,0,0.05);
+      position: relative;
+      margin: 0 auto;
+    }
+    .phone-notch {
+      position: absolute;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 120px;
+      height: 28px;
+      background: #2A2522;
+      border-radius: 0 0 18px 18px;
+      z-index: 2;
+    }
+    .phone-screen {
+      width: 100%;
+      height: 100%;
+      background: var(--bg);
+      padding: 40px 20px 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .phone-status-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-main);
+      margin-bottom: 4px;
+    }
+    .phone-greeting { font-size: 22px; font-weight: 700; color: var(--text-main); }
+    .phone-subtitle { font-size: 13px; color: var(--text-sub); margin-bottom: 8px; }
+    .phone-card {
+      background: linear-gradient(135deg, var(--primary-gradient-start), var(--primary-gradient-end));
+      border-radius: 16px;
+      padding: 16px;
+      color: #fff;
+    }
+    .phone-card-label { font-size: 11px; opacity: 0.85; margin-bottom: 8px; }
+    .phone-card-title { font-size: 16px; font-weight: 700; margin-bottom: 4px; }
+    .phone-card-sub { font-size: 12px; opacity: 0.8; }
+    .phone-card-plain {
+      background: var(--card-bg);
+      border-radius: 16px;
+      padding: 14px 16px;
+      box-shadow: var(--shadow-card);
+    }
+    .phone-card-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .phone-card-row-left { font-size: 13px; font-weight: 600; color: var(--text-main); }
+    .phone-card-row-right { font-size: 12px; color: var(--text-sub); }
+    .phone-emoji-row {
+      display: flex;
+      gap: 10px;
+      justify-content: space-around;
+      padding: 8px 0 4px;
+    }
+    .phone-emoji-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      font-size: 20px;
+    }
+    .phone-emoji-item span:last-child { font-size: 10px; color: var(--text-sub); }
+    .phone-tab-bar {
+      margin-top: auto;
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      padding: 10px 0 6px;
+      border-top: 1px solid rgba(189, 181, 177, 0.2);
+    }
+    .phone-tab-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2px;
+      font-size: 10px;
+      color: var(--text-muted);
+    }
+    .phone-tab-item.active { color: var(--primary); }
+    .phone-tab-item svg { width: 20px; height: 20px; }
+    .phone-fab {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--primary-gradient-start), var(--primary-gradient-end));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-size: 22px;
+      margin-top: -20px;
+      box-shadow: 0 4px 12px rgba(242, 122, 84, 0.35);
+    }
+
+    .hero-float-1, .hero-float-2, .hero-float-3 {
+      position: absolute;
+      background: var(--card-bg);
+      border-radius: 16px;
+      padding: 12px 16px;
+      box-shadow: var(--shadow-card);
+      font-size: 13px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      animation: float 3s ease-in-out infinite;
+      z-index: 3;
+    }
+    .hero-float-1 {
+      top: 60px; left: -40px;
+      animation-delay: 0s;
+    }
+    .hero-float-2 {
+      top: 160px; right: -30px;
+      animation-delay: 1s;
+    }
+    .hero-float-3 {
+      bottom: 100px; left: -20px;
+      animation-delay: 0.5s;
+    }
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-8px); }
+    }
+
+    /* ===== FEATURES ===== */
+    .features {
+      padding: 80px 0;
+    }
+    .section-header {
+      text-align: center;
+      margin-bottom: 56px;
+    }
+    .section-tag {
+      display: inline-block;
+      padding: 4px 14px;
+      background: var(--primary-light);
+      color: var(--primary);
+      font-size: 13px;
+      font-weight: 600;
+      border-radius: 999px;
+      margin-bottom: 16px;
+    }
+    .section-header h2 {
+      font-size: 36px;
+      font-weight: 800;
+      letter-spacing: -1px;
+      margin-bottom: 16px;
+    }
+    .section-header p {
+      font-size: 16px;
+      color: var(--text-sub);
+      max-width: 480px;
+      margin: 0 auto;
+    }
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+    }
+    .feature-card {
+      background: var(--card-bg);
+      border-radius: var(--radius-card);
+      padding: 28px 24px;
+      box-shadow: var(--shadow-card);
+      transition: transform 0.25s ease, box-shadow 0.25s ease;
+    }
+    .feature-card:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-card-hover);
+    }
+    .feature-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      margin-bottom: 18px;
+    }
+    .feature-icon.orange { background: var(--primary-light); }
+    .feature-icon.green { background: var(--success-light); }
+    .feature-icon.yellow { background: var(--warning-light); }
+    .feature-card h3 {
+      font-size: 17px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+    .feature-card p {
+      font-size: 14px;
+      color: var(--text-sub);
+      line-height: 1.65;
+    }
+
+    /* ===== HIGHLIGHT ===== */
+    .highlight {
+      padding: 80px 0;
+    }
+    .highlight-card {
+      background: linear-gradient(135deg, var(--primary-gradient-start), var(--primary-gradient-end));
+      border-radius: 28px;
+      padding: 56px 48px;
+      color: #fff;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 48px;
+      align-items: center;
+      overflow: hidden;
+      position: relative;
+    }
+    .highlight-card::before {
+      content: '';
+      position: absolute;
+      top: -60px;
+      right: -60px;
+      width: 240px;
+      height: 240px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.08);
+    }
+    .highlight-card::after {
+      content: '';
+      position: absolute;
+      bottom: -40px;
+      left: 30%;
+      width: 180px;
+      height: 180px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.05);
+    }
+    .highlight-content { position: relative; z-index: 1; }
+    .highlight-content h2 {
+      font-size: 32px;
+      font-weight: 800;
+      margin-bottom: 16px;
+      letter-spacing: -0.5px;
+    }
+    .highlight-content p {
+      font-size: 16px;
+      opacity: 0.9;
+      line-height: 1.7;
+      margin-bottom: 8px;
+    }
+    .highlight-items {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    .highlight-item {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      background: rgba(255,255,255,0.15);
+      backdrop-filter: blur(8px);
+      border-radius: 14px;
+      padding: 16px 20px;
+    }
+    .highlight-item-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      background: rgba(255,255,255,0.2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      flex-shrink: 0;
+    }
+    .highlight-item-text h4 { font-size: 15px; font-weight: 700; margin-bottom: 2px; }
+    .highlight-item-text p { font-size: 13px; opacity: 0.8; }
+
+    /* ===== PRIVACY ===== */
+    .privacy {
+      padding: 80px 0;
+    }
+    .privacy-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 24px;
+    }
+    .privacy-card {
+      background: var(--card-bg);
+      border-radius: var(--radius-card);
+      padding: 32px 28px;
+      box-shadow: var(--shadow-card);
+      display: flex;
+      gap: 20px;
+      align-items: flex-start;
+      transition: transform 0.25s ease;
+    }
+    .privacy-card:hover { transform: translateY(-3px); }
+    .privacy-icon {
+      width: 52px;
+      height: 52px;
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      flex-shrink: 0;
+      background: var(--primary-light);
+    }
+    .privacy-card h3 { font-size: 17px; font-weight: 700; margin-bottom: 8px; }
+    .privacy-card p { font-size: 14px; color: var(--text-sub); line-height: 1.65; }
+
+    /* ===== DOWNLOAD ===== */
+    .download {
+      padding: 100px 0 120px;
+      text-align: center;
+    }
+    .download h2 {
+      font-size: 36px;
+      font-weight: 800;
+      letter-spacing: -1px;
+      margin-bottom: 16px;
+    }
+    .download > p {
+      font-size: 16px;
+      color: var(--text-sub);
+      margin-bottom: 40px;
+      max-width: 420px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .download-buttons {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+    .store-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 14px;
+      padding: 16px 32px;
+      background: var(--card-bg);
+      border: 1.5px solid rgba(189, 181, 177, 0.25);
+      border-radius: 16px;
+      text-decoration: none;
+      color: var(--text-main);
+      transition: border-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+      box-shadow: var(--shadow-card);
+      cursor: pointer;
+    }
+    .store-btn:hover {
+      border-color: var(--primary);
+      transform: translateY(-3px);
+      box-shadow: var(--shadow-card-hover);
+    }
+    .store-btn-icon {
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .store-btn-icon svg { width: 32px; height: 32px; }
+    .store-btn-text { text-align: left; }
+    .store-btn-text small {
+      display: block;
+      font-size: 11px;
+      color: var(--text-sub);
+      font-weight: 500;
+      letter-spacing: 0.3px;
+    }
+    .store-btn-text strong {
+      display: block;
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: -0.3px;
+    }
+    .download-note {
+      margin-top: 20px;
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+
+    /* ===== FOOTER ===== */
+    footer {
+      border-top: 1px solid rgba(189, 181, 177, 0.2);
+      padding: 32px 0;
+    }
+    .footer-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+    .footer-left {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 14px;
+      color: var(--text-sub);
+    }
+    .footer-left .butterfly { font-size: 18px; }
+    .footer-links {
+      display: flex;
+      gap: 24px;
+    }
+    .footer-links a {
+      font-size: 14px;
+      color: var(--text-sub);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+    .footer-links a:hover { color: var(--primary); }
+
+    /* ===== RESPONSIVE ===== */
+    @media (max-width: 900px) {
+      .features-grid { grid-template-columns: repeat(2, 1fr); }
+      .highlight-card { grid-template-columns: 1fr; padding: 40px 32px; }
+      .hero h1 { font-size: 38px; }
+      .hero-float-1, .hero-float-2, .hero-float-3 { display: none; }
+    }
+    @media (max-width: 640px) {
+      .hero { padding-top: 110px; padding-bottom: 60px; }
+      .hero h1 { font-size: 30px; }
+      .hero p { font-size: 16px; }
+      .nav-links { display: none; }
+      .mobile-menu-btn { display: block; }
+      .features-grid { grid-template-columns: 1fr; }
+      .privacy-grid { grid-template-columns: 1fr; }
+      .section-header h2 { font-size: 28px; }
+      .download h2 { font-size: 28px; }
+      .highlight-content h2 { font-size: 26px; }
+      .phone-mockup { width: 240px; height: 500px; }
+      .store-btn { padding: 14px 24px; }
+      .store-btn-text strong { font-size: 16px; }
+      .footer-inner { flex-direction: column; text-align: center; }
+    }
+
+    /* ===== ANIMATIONS ===== */
+    .fade-up {
+      opacity: 0;
+      transform: translateY(24px);
+      transition: opacity 0.6s ease, transform 0.6s ease;
+    }
+    .fade-up.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav id="navbar">
+    <div class="nav-inner">
+      <a href="#" class="nav-logo">
+        <div class="nav-logo-icon">🦋</div>
+        <span class="nav-logo-text">甲安日记</span>
+      </a>
+      <ul class="nav-links">
+        <li><a href="#features">功能</a></li>
+        <li><a href="#privacy">隐私</a></li>
+        <li><a href="https://github.com/bonanliu/ThyroidDiary" target="_blank" rel="noopener">GitHub</a></li>
+        <li><a href="#download" class="nav-download-btn">免费下载</a></li>
+      </ul>
+      <button class="mobile-menu-btn" id="menuBtn" aria-label="菜单">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+      </button>
+    </div>
+  </nav>
+  <div class="mobile-menu" id="mobileMenu">
+    <a href="#features" onclick="closeMobile()">功能特性</a>
+    <a href="#privacy" onclick="closeMobile()">隐私安全</a>
+    <a href="https://github.com/bonanliu/ThyroidDiary" target="_blank" rel="noopener">GitHub</a>
+    <a href="#download" onclick="closeMobile()">免费下载</a>
+  </div>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="container">
+      <div class="fade-up">
+        <div class="hero-badge">
+          <span class="hero-badge-dot"></span>
+          完全免费 &middot; 开源项目
+        </div>
+        <h1>你的甲亢康复<br><span class="gradient-text">温暖健康伴侣</span></h1>
+        <p>帮你在漫长治疗中坚持记录、规律用药、追踪变化。<br>数据完全本地存储，你的隐私由你掌控。</p>
+        <div class="hero-buttons">
+          <a href="#download" class="btn-primary">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            免费下载
+          </a>
+          <a href="https://github.com/bonanliu/ThyroidDiary" target="_blank" rel="noopener" class="btn-secondary">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+            查看源码
+          </a>
+        </div>
+      </div>
+      <div class="hero-visual fade-up" style="transition-delay: 0.2s;">
+        <div class="phone-mockup">
+          <div class="phone-notch"></div>
+          <div class="phone-screen">
+            <div class="phone-status-bar">
+              <span>9:41</span>
+              <span style="font-size:11px; opacity:0.6;">治疗第 42 天</span>
+            </div>
+            <div class="phone-greeting">早上好 ☀️</div>
+            <div class="phone-subtitle">坚持记录，每一步都算数</div>
+            <div class="phone-card">
+              <div class="phone-card-label">💊 今日用药</div>
+              <div class="phone-card-title">甲巯咪唑 10mg</div>
+              <div class="phone-card-sub">每日 1 次 · 餐后服用</div>
+            </div>
+            <div class="phone-card-plain">
+              <div class="phone-card-row">
+                <span class="phone-card-row-left">今天感觉如何？</span>
+                <span class="phone-card-row-right">快速记录 →</span>
+              </div>
+              <div class="phone-emoji-row">
+                <div class="phone-emoji-item"><span>💓</span><span>心悸</span></div>
+                <div class="phone-emoji-item"><span>🫨</span><span>手抖</span></div>
+                <div class="phone-emoji-item"><span>😰</span><span>出汗</span></div>
+                <div class="phone-emoji-item"><span>😴</span><span>乏力</span></div>
+              </div>
+            </div>
+            <div class="phone-card-plain">
+              <div class="phone-card-row">
+                <span class="phone-card-row-left">📅 下次复诊</span>
+                <span class="phone-card-row-right" style="color: var(--primary); font-weight: 600;">12 天后</span>
+              </div>
+            </div>
+            <div class="phone-card-plain">
+              <div class="phone-card-row">
+                <span class="phone-card-row-left">📊 近期 TSH</span>
+                <span class="phone-card-row-right" style="color: var(--success); font-weight: 600;">0.15 ↓</span>
+              </div>
+            </div>
+            <div class="phone-tab-bar">
+              <div class="phone-tab-item active">
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/></svg>
+                <span>首页</span>
+              </div>
+              <div class="phone-tab-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                <span>记录</span>
+              </div>
+              <div class="phone-fab">+</div>
+              <div class="phone-tab-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+                <span>趋势</span>
+              </div>
+              <div class="phone-tab-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                <span>我的</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="hero-float-1">💊 <span style="color: var(--success);">已服药 ✓</span></div>
+        <div class="hero-float-2">📊 <span>TSH 逐步恢复</span></div>
+        <div class="hero-float-3">🔥 <span>连续 42 天</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FEATURES -->
+  <section class="features" id="features">
+    <div class="container">
+      <div class="section-header fade-up">
+        <span class="section-tag">功能特性</span>
+        <h2>为你的康复之路量身打造</h2>
+        <p>涵盖用药、症状、指标、复诊全流程，让你专注于恢复本身</p>
+      </div>
+      <div class="features-grid">
+        <div class="feature-card fade-up">
+          <div class="feature-icon orange">💊</div>
+          <h3>用药打卡</h3>
+          <p>支持甲巯咪唑、PTU 等常用药，灵活配置剂量与频次。每日提醒，不漏服一粒药。</p>
+        </div>
+        <div class="feature-card fade-up" style="transition-delay: 0.1s;">
+          <div class="feature-icon orange">🫨</div>
+          <h3>症状记录</h3>
+          <p>心悸、手抖、乏力等 9 种常见症状，一键评分记录。感觉不错？"今天都挺好"一键搞定。</p>
+        </div>
+        <div class="feature-card fade-up" style="transition-delay: 0.2s;">
+          <div class="feature-icon green">📊</div>
+          <h3>趋势分析</h3>
+          <p>TSH、FT3、FT4 等化验指标折线图，直观追踪变化，看到每一点进步。</p>
+        </div>
+        <div class="feature-card fade-up" style="transition-delay: 0.05s;">
+          <div class="feature-icon yellow">📅</div>
+          <h3>复诊管理</h3>
+          <p>复诊倒计时提醒，拍照上传检查报告，记录医嘱与药量调整，就诊高效有序。</p>
+        </div>
+        <div class="feature-card fade-up" style="transition-delay: 0.15s;">
+          <div class="feature-icon orange">🏆</div>
+          <h3>温暖激励</h3>
+          <p>连续记录天数、治疗里程碑，指标改善时的温馨反馈。没有惩罚，只有鼓励。</p>
+        </div>
+        <div class="feature-card fade-up" style="transition-delay: 0.25s;">
+          <div class="feature-icon green">📱</div>
+          <h3>离线可用</h3>
+          <p>无需网络即可完成全部核心操作。完整离线体验，随时随地安心记录。</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- HIGHLIGHT -->
+  <section class="highlight">
+    <div class="container">
+      <div class="highlight-card fade-up">
+        <div class="highlight-content">
+          <h2>一站式健康档案<br>治疗全程陪伴</h2>
+          <p>从用药记录到化验指标，从症状追踪到复诊管理，所有信息汇聚一处。</p>
+          <p>体征数据、睡眠质量、打卡日历热力图……全面掌握你的康复进度。</p>
+        </div>
+        <div class="highlight-items">
+          <div class="highlight-item">
+            <div class="highlight-item-icon">📈</div>
+            <div class="highlight-item-text">
+              <h4>7 / 30 / 90 天趋势</h4>
+              <p>灵活时间范围，看清长期变化趋势</p>
+            </div>
+          </div>
+          <div class="highlight-item">
+            <div class="highlight-item-icon">🌡️</div>
+            <div class="highlight-item-text">
+              <h4>体征 & 睡眠追踪</h4>
+              <p>心率、体重、血压、体温、睡眠质量</p>
+            </div>
+          </div>
+          <div class="highlight-item">
+            <div class="highlight-item-icon">📋</div>
+            <div class="highlight-item-text">
+              <h4>化验指标管理</h4>
+              <p>TSH / FT3 / FT4 / TRAb 等自动异常标记</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PRIVACY -->
+  <section class="privacy" id="privacy">
+    <div class="container">
+      <div class="section-header fade-up">
+        <span class="section-tag">隐私安全</span>
+        <h2>你的数据，你做主</h2>
+        <p>不同于需要联网的医疗 App，甲安日记把数据控制权完全交给你</p>
+      </div>
+      <div class="privacy-grid">
+        <div class="privacy-card fade-up">
+          <div class="privacy-icon">🔒</div>
+          <div>
+            <h3>本地存储，零上传</h3>
+            <p>所有健康数据完全存储在手机本地，不会上传到任何服务器。无需注册账号，无需担心数据泄露。</p>
+          </div>
+        </div>
+        <div class="privacy-card fade-up" style="transition-delay: 0.1s;">
+          <div class="privacy-icon">☁️</div>
+          <div>
+            <h3>可选备份同步</h3>
+            <p>支持通过 Git / Gitee / WebDAV 自行备份。同步方式完全由你选择，随时可关闭。</p>
+          </div>
+        </div>
+        <div class="privacy-card fade-up" style="transition-delay: 0.05s;">
+          <div class="privacy-icon">🌐</div>
+          <div>
+            <h3>完整离线体验</h3>
+            <p>无需网络即可完成用药打卡、症状记录、查看趋势等全部核心操作。</p>
+          </div>
+        </div>
+        <div class="privacy-card fade-up" style="transition-delay: 0.15s;">
+          <div class="privacy-icon">🔓</div>
+          <div>
+            <h3>开源透明</h3>
+            <p>源代码完全公开在 GitHub，任何人都可以审查。没有隐藏的数据收集，没有第三方 SDK。</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- DOWNLOAD -->
+  <section class="download" id="download">
+    <div class="container fade-up">
+      <h2>开始你的康复之旅</h2>
+      <p>甲安日记完全免费，无广告、无内购。现在就下载，开始温暖记录吧！</p>
+      <div class="download-buttons">
+        <a href="https://github.com/bonanliu/ThyroidDiary/releases" target="_blank" rel="noopener" class="store-btn" aria-label="在 Google Play 下载">
+          <div class="store-btn-icon">
+            <svg viewBox="0 0 24 24" fill="none">
+              <path d="M3.609 1.814L13.792 12 3.61 22.186a.996.996 0 01-.61-.92V2.734a1 1 0 01.609-.92z" fill="#4CAF50"/>
+              <path d="M16.207 10.414l-2.415-2.414L5.588 16.2l11.043 6.383a1 1 0 001.344-.448l2.175-3.763-3.943-7.958z" fill="#F44336"/>
+              <path d="M21.15 5.628l-2.175-3.763a1 1 0 00-1.344-.448L5.588 7.8l8.204 8.2 2.415-2.414 3.943-7.958z" fill="#FFC107"/>
+              <path d="M5.588 7.8L3.61 1.814a1 1 0 00-.61.92v19.532a1 1 0 00.609.92L5.588 16.2 13.792 12 5.588 7.8z" fill="#2196F3"/>
+            </svg>
+          </div>
+          <div class="store-btn-text">
+            <small>DOWNLOAD ON</small>
+            <strong>Google Play</strong>
+          </div>
+        </a>
+        <a href="https://github.com/bonanliu/ThyroidDiary/releases" target="_blank" rel="noopener" class="store-btn" aria-label="在 App Store 下载">
+          <div class="store-btn-icon">
+            <svg viewBox="0 0 24 24" fill="#333">
+              <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/>
+            </svg>
+          </div>
+          <div class="store-btn-text">
+            <small>DOWNLOAD ON</small>
+            <strong>App Store</strong>
+          </div>
+        </a>
+        <a href="https://github.com/bonanliu/ThyroidDiary/releases" target="_blank" rel="noopener" class="store-btn" aria-label="下载 Android APK">
+          <div class="store-btn-icon">
+            <svg viewBox="0 0 24 24" fill="#332B27">
+              <path d="M17.523 2.18l1.644-2.847a.344.344 0 00-.126-.47.344.344 0 00-.47.126l-1.665 2.883A10.177 10.177 0 0012.002.698a10.177 10.177 0 00-4.904 1.174L5.433-1.01a.344.344 0 00-.47-.126.344.344 0 00-.126.47L6.481 2.18C4.45 3.353 3.117 5.36 3.006 7.66h17.988c-.111-2.3-1.444-4.307-3.475-5.48zM8.005 5.6a.712.712 0 110-1.424.712.712 0 010 1.424zm7.994 0a.712.712 0 110-1.424.712.712 0 010 1.424zM3.006 8.37v10.168C3.006 19.917 4.09 21 5.418 21h.853v3.546c0 .802.65 1.453 1.453 1.453.802 0 1.453-.65 1.453-1.453V21h3.644v3.546c0 .802.65 1.453 1.453 1.453.802 0 1.453-.65 1.453-1.453V21h.853c1.328 0 2.412-1.083 2.412-2.462V8.37H3.006z" transform="translate(0, -0.698) scale(0.9)"/>
+            </svg>
+          </div>
+          <div class="store-btn-text">
+            <small>ANDROID</small>
+            <strong>APK 直装</strong>
+          </div>
+        </a>
+      </div>
+      <p class="download-note">下载链接将跳转至 GitHub Releases 页面</p>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="container">
+      <div class="footer-inner">
+        <div class="footer-left">
+          <span class="butterfly">🦋</span>
+          <span>甲安日记 &copy; 2026 &middot; 以温暖守护每一次记录</span>
+        </div>
+        <div class="footer-links">
+          <a href="https://github.com/bonanliu/ThyroidDiary" target="_blank" rel="noopener">GitHub</a>
+          <a href="#">隐私政策</a>
+          <a href="#">联系我们</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // Scroll animations
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+        }
+      });
+    }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+
+    document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
+
+    // Navbar scroll effect
+    const navbar = document.getElementById('navbar');
+    window.addEventListener('scroll', () => {
+      navbar.classList.toggle('scrolled', window.scrollY > 10);
+    });
+
+    // Mobile menu
+    const menuBtn = document.getElementById('menuBtn');
+    const mobileMenu = document.getElementById('mobileMenu');
+    let menuOpen = false;
+    menuBtn.addEventListener('click', () => {
+      menuOpen = !menuOpen;
+      mobileMenu.classList.toggle('open', menuOpen);
+    });
+    function closeMobile() {
+      menuOpen = false;
+      mobileMenu.classList.remove('open');
+    }
+
+    // Reduce motion
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      document.querySelectorAll('.fade-up').forEach(el => {
+        el.style.transition = 'none';
+        el.classList.add('visible');
+      });
+      document.querySelectorAll('.hero-float-1, .hero-float-2, .hero-float-3').forEach(el => {
+        el.style.animation = 'none';
+      });
+    }
+  </script>
+</body>
+</html>
